@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.0)
+project(G4TestBench VERSION 0.1.0)
+
+set(CMAKE_CXX_STANDARD 11)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "..." FORCE)
+endif()
+
+option(WITH_G4_VIS "Build with Geant4 Vis drivers" ON)
+
+# Find Geant4
+if(WITH_G4_VIS)
+    find_package(Geant4 REQUIRED ui_all vis_all)
+else()
+    find_package(Geant4 REQUIRED ui_all)
+endif()
+include(${Geant4_USE_FILE})
+
+# Set sources and headers
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.hh)
+file(GLOB detector_sources ${PROJECT_SOURCE_DIR}/src/detectors/*.cc)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+
+# Create targets
+add_executable(g4testbench ${sources} ${detector_sources})
+target_link_libraries(g4testbench ${Geant4_LIBRARIES})
+
+# Install targets and headers
+install(TARGETS g4testbench DESTINATION bin)
