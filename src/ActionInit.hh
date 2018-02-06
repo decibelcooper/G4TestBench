@@ -1,5 +1,5 @@
-#ifndef G4_TEST_BENCHACTION_INIT_H
-#define G4_TEST_BENCHACTION_INIT_H
+#ifndef G4_TEST_BENCH_ACTION_INIT_H
+#define G4_TEST_BENCH_ACTION_INIT_H
 
 #include <pthread.h>
 
@@ -21,4 +21,4 @@ class ActionInit : public G4VUserActionInitialization {
 };
 }  // namespace g4testbench
 
-#endif  // G4_TEST_BENCHACTION_INIT_H
+#endif  // G4_TEST_BENCH_ACTION_INIT_H

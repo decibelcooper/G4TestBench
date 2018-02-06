@@ -14,7 +14,6 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() {
     gun = new G4ParticleGun(1);
     gun->SetParticleDefinition(particle);
     gun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
-    gun->SetParticlePolarization(G4ThreeVector(0, 1, 0));
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction() { delete gun; }
