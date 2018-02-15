@@ -17,15 +17,20 @@ else()
 endif()
 include(${Geant4_USE_FILE})
 
+# Find g4pbc
+find_package(g4pbc REQUIRED)
+include_directories(${g4pbc_INCLUDE_DIRS})
+
 # Set sources and headers
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.hh)
 file(GLOB detector_sources ${PROJECT_SOURCE_DIR}/src/detectors/*.cc)
+file(GLOB phys_list_sources ${PROJECT_SOURCE_DIR}/src/physicsLists/*.cc)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # Create targets
-add_executable(g4testbench ${sources} ${detector_sources})
-target_link_libraries(g4testbench ${Geant4_LIBRARIES})
+add_executable(g4testbench ${sources} ${detector_sources} ${phys_list_sources})
+target_link_libraries(g4testbench ${Geant4_LIBRARIES} g4pbc::g4pbc)
 
 # Install targets and headers
 install(TARGETS g4testbench DESTINATION bin)

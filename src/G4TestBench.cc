@@ -16,23 +16,29 @@
 using namespace g4testbench;
 
 std::map<G4String, DetFactory *> Detector::factories;
+std::map<G4String, PhysFactory *> PhysicsList::factories;
 
 void printUsage() {
     std::cerr << "Usage: g4testbench [options] <detector type> <macro file>\n";
     std::cerr << "options:\n";
     std::cerr << "  -n  number of threads (default 1)\n";
+    std::cerr << "  -p  physics list (default QGSP_BERT_HP)\n";
     std::cerr << "  -v  verbose\n";
     std::cerr << std::endl;
 }
 
 int main(int argc, char **argv) {
     int nThreads = 1;
+    G4String physListType = "QGSP_BERT_HP";
     bool verbose = false;
     int opt;
-    while ((opt = getopt(argc, argv, "n:vh")) != -1) {
+    while ((opt = getopt(argc, argv, "n:p:vh")) != -1) {
         switch (opt) {
             case 'n':
                 nThreads = atoi(optarg);
+                break;
+            case 'p':
+                physListType = optarg;
                 break;
             case 'v':
                 verbose = true;
@@ -71,7 +77,16 @@ int main(int argc, char **argv) {
 #endif
 
     runManager->SetUserInitialization(detConst);
-    runManager->SetUserInitialization(new QGSP_BERT_HP());
+    G4VUserPhysicsList *physList = PhysicsList::Create(physListType);
+    if (physList == NULL) {
+        std::cerr << "Physics list " << physListType << " not available\n";
+        std::cerr << "Available physics lists:\n";
+        for (auto type : PhysicsList::AvailableTypes()) {
+            std::cerr << "\t" << type << "\n";
+        }
+        exit(EXIT_FAILURE);
+    }
+    runManager->SetUserInitialization(physList);
     runManager->SetUserInitialization(new ActionInit("asdf"));
 
     runManager->Initialize();
