@@ -23,14 +23,13 @@ void printUsage() {
     std::cerr << "options:\n";
     std::cerr << "  -n  number of threads (default 1)\n";
     std::cerr << "  -p  physics list (default QGSP_BERT_HP)\n";
-    std::cerr << "  -v  verbose\n";
     std::cerr << std::endl;
 }
 
 int main(int argc, char **argv) {
     int nThreads = 1;
+    (void)nThreads;
     G4String physListType = "QGSP_BERT_HP";
-    bool verbose = false;
     int opt;
     while ((opt = getopt(argc, argv, "n:p:vh")) != -1) {
         switch (opt) {
@@ -39,9 +38,6 @@ int main(int argc, char **argv) {
                 break;
             case 'p':
                 physListType = optarg;
-                break;
-            case 'v':
-                verbose = true;
                 break;
             default:
                 printUsage();

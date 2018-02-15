@@ -14,7 +14,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() {
     gun = new G4ParticleGun(1);
     gun->SetParticleDefinition(particle);
     gun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
-    gun->SetParticleEnergy(10 * CLHEP::keV);
+    gun->SetParticleEnergy(2 * CLHEP::MeV);
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction() { delete gun; }

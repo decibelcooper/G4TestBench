@@ -1,2 +1,3 @@
 /tracking/verbose 1
+/run/setCut 10 nm
 /run/beamOn 1

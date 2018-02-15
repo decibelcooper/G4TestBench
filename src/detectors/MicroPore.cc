@@ -32,7 +32,6 @@ class MicroPore : public G4VUserDetectorConstruction {
         auto blockPoreSolid = new G4Tubs("blockPoreSolid", 0, poreRadius, 2 * blockHalfDepth / cos(biasAngle),
                                          0, 2 * CLHEP::pi);
         int nPores = 0;
-        G4VPhysicalVolume *pv = NULL;
         for (int i = 0; i < 3; i++) {
             double y = (i - 1) * cellHalfHeight;
             for (double x = (i % 2 - 1) * cellHalfWidth; x <= cellHalfWidth; x += 2 * cellHalfWidth) {
@@ -51,18 +50,17 @@ class MicroPore : public G4VUserDetectorConstruction {
                     nameSS.str("");
 
                     nameSS << "blockPorePhys(" << nPores << ")";
-                    pv = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), blockPoreLog, nameSS.str(), periodicLog,
+                    new G4PVPlacement(0, G4ThreeVector(0, 0, 0), blockPoreLog, nameSS.str(), periodicLog,
                                            false, 0, false);
 
                     nPores++;
                 }
             }
         }
-        if (pv) pv->CheckOverlaps();
         std::cout << "NUM PORES: " << nPores << std::endl;
 
         G4VPhysicalVolume *worldPhys =
-            new G4PVPlacement(0, G4ThreeVector(), worldLog, "worldPhys", 0, false, 0, true);
+            new G4PVPlacement(0, G4ThreeVector(), worldLog, "worldPhys", 0, false, 0, false);
         return worldPhys;
     }
 
