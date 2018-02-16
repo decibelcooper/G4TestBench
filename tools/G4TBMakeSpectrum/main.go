@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	nBins = flag.Int("n", 100, "number of bins")
-	min   = flag.Float64("min", 1, "minimum x value")
-	max   = flag.Float64("max", 4500, "maximum x value")
+	nBins  = flag.Int("n", 100, "number of bins")
+	min    = flag.Float64("min", 1, "minimum x value")
+	max    = flag.Float64("max", 4500, "maximum x value")
+	lambda = flag.Float64("lambda", 4.0, "average number of electron secondaries per hit")
 )
 
 func printUsage() {
@@ -49,7 +50,7 @@ func main() {
 	defer reader.Close()
 
 	RNG := rand.New(rand.NewSource(0))
-	poiss := &distuv.Poisson{Lambda: 4.0,
+	poiss := &distuv.Poisson{Lambda: *lambda,
 		Src: RNG,
 	}
 
