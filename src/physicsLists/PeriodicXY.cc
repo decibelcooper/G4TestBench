@@ -8,6 +8,7 @@ class PeriodicXY : public QGSP_BERT_HP {
    public:
     PeriodicXY() {
         auto constructor = new G4PeriodicBoundaryPhysics("PeriodicXY", true, true, false, false);
+        constructor->SetVerboseLevel(0);
         RegisterPhysics(constructor);
     }
 };

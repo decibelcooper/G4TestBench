@@ -4,7 +4,11 @@
 #include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
 #include <G4PeriodicBoundaryBuilder.hh>
+#include <G4Step.hh>
+#include <G4THitsCollection.hh>
+#include <G4TouchableHistory.hh>
 #include <G4Tubs.hh>
+#include <G4VSensitiveDetector.hh>
 
 #include "G4TestBench.hh"
 
@@ -42,7 +46,7 @@ class MicroPore : public G4VUserDetectorConstruction {
                     nameSS << "blockPoreSolid(" << nPores << ")";
                     auto thisBlockPoreSolid = new G4IntersectionSolid(
                         nameSS.str(), periodicLog->GetSolid(), blockPoreSolid,
-                        new G4RotationMatrix(0, biasAngle, 0), G4ThreeVector(x, y, z));
+                        new G4RotationMatrix(CLHEP::pi / 2., biasAngle, 0), G4ThreeVector(x, y, z));
                     nameSS.str("");
 
                     nameSS << "blockPoreLog(" << nPores << ")";
@@ -51,7 +55,7 @@ class MicroPore : public G4VUserDetectorConstruction {
 
                     nameSS << "blockPorePhys(" << nPores << ")";
                     new G4PVPlacement(0, G4ThreeVector(0, 0, 0), blockPoreLog, nameSS.str(), periodicLog,
-                                           false, 0, false);
+                                      false, 0, false);
 
                     nPores++;
                 }
@@ -64,7 +68,30 @@ class MicroPore : public G4VUserDetectorConstruction {
         return worldPhys;
     }
 
-    void ConstructSDandField() { ; }
+    class SensitiveDetector : public G4VSensitiveDetector {
+       public:
+        SensitiveDetector(G4String name) : G4VSensitiveDetector(name) { collectionName.insert(name); }
+        ~SensitiveDetector() { ; }
+
+        void Initialize(G4HCofThisEvent *) { ; }
+        void EndOfEvent(G4HCofThisEvent *) { ; }
+
+        G4bool ProcessHits(G4Step *step, G4TouchableHistory *) {
+            G4StepPoint *postPoint = step->GetPostStepPoint();
+            if (postPoint->GetStepStatus() != fGeomBoundary) return false;
+            if (!postPoint->GetPhysicalVolume()->GetName().contains("blockPorePhys")) return false;
+            G4Track *track = step->GetTrack();
+            G4ParticleDefinition *def = track->GetDefinition();
+            if (def->GetPDGCharge() == 0) return false;
+
+            G4ThreeVector pos = postPoint->GetPosition();
+            std::cout << "HIT: " << pos.x() << ", " << pos.y() << ", " << pos.z() << std::endl;
+
+            return true;
+        }
+    };
+
+    void ConstructSDandField() { SetSensitiveDetector("logical_periodic", new SensitiveDetector("poreSD")); }
 };
 
 DETECTOR_TYPE(MicroPore)
