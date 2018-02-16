@@ -11,8 +11,13 @@ import (
 	"go-hep.org/x/hep/hplot"
 	"golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/stat/distuv"
-	//"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
+)
+
+var (
+	nBins = flag.Int("n", 100, "number of bins")
+	min   = flag.Float64("min", 1, "minimum x value")
+	max   = flag.Float64("max", 4500, "maximum x value")
 )
 
 func printUsage() {
@@ -45,7 +50,7 @@ func main() {
 		Src: RNG,
 	}
 
-	hist := hbook.NewH1D(100, 1, 4500)
+	hist := hbook.NewH1D(*nBins, *min, *max)
 	for event := range reader.ScanEvents() {
 		simIDs := event.TaggedEntries("Simulated")
 		var totCharge float64
