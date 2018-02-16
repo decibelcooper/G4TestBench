@@ -1,9 +1,11 @@
+#include <proio/model/eic.pb.h>
 #include <G4Box.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4LogicalVolume.hh>
 #include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
 #include <G4PeriodicBoundaryBuilder.hh>
+#include <G4SDManager.hh>
 #include <G4Step.hh>
 #include <G4THitsCollection.hh>
 #include <G4TouchableHistory.hh>
@@ -70,10 +72,17 @@ class MicroPore : public G4VUserDetectorConstruction {
 
     class SensitiveDetector : public G4VSensitiveDetector {
        public:
-        SensitiveDetector(G4String name) : G4VSensitiveDetector(name) { collectionName.insert(name); }
-        ~SensitiveDetector() { ; }
+        SensitiveDetector(G4String name) : G4VSensitiveDetector(name) {
+            hitsCollection = 0;
+            collectionName.insert(name);
+        }
 
-        void Initialize(G4HCofThisEvent *) { ; }
+        class XYZTDHit : public G4VHit, public proio::model::eic::XYZTD {};
+
+        void Initialize(G4HCofThisEvent *hcc) {
+            hitsCollection = new G4THitsCollection<XYZTDHit>(SensitiveDetectorName, collectionName[0]);
+            hcc->AddHitsCollection(GetCollectionID(0), hitsCollection);
+        }
         void EndOfEvent(G4HCofThisEvent *) { ; }
 
         G4bool ProcessHits(G4Step *step, G4TouchableHistory *) {
@@ -83,15 +92,28 @@ class MicroPore : public G4VUserDetectorConstruction {
             G4Track *track = step->GetTrack();
             G4ParticleDefinition *def = track->GetDefinition();
             if (def->GetPDGCharge() == 0) return false;
+            if (!hitsCollection) return false;
 
             G4ThreeVector pos = postPoint->GetPosition();
-            std::cout << "HIT: " << pos.x() << ", " << pos.y() << ", " << pos.z() << std::endl;
+            auto hit = new XYZTDHit();
+            hit->set_x(pos.x() / CLHEP::mm);
+            hit->set_y(pos.y() / CLHEP::mm);
+            hit->set_z(pos.z() / CLHEP::mm);
+            hit->set_t(postPoint->GetGlobalTime() / CLHEP::ns);
+            hitsCollection->insert(hit);
 
             return true;
         }
+
+       private:
+        G4THitsCollection<XYZTDHit> *hitsCollection;
     };
 
-    void ConstructSDandField() { SetSensitiveDetector("logical_periodic", new SensitiveDetector("poreSD")); }
+    void ConstructSDandField() {
+        auto poreSD = new SensitiveDetector("pore");
+        G4SDManager::GetSDMpointer()->AddNewDetector(poreSD);
+        SetSensitiveDetector("logical_periodic", poreSD);
+    }
 };
 
 DETECTOR_TYPE(MicroPore)

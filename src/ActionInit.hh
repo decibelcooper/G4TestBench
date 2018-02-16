@@ -17,7 +17,6 @@ class ActionInit : public G4VUserActionInitialization {
 
    private:
     G4String outputFile;
-    pthread_mutex_t eventWriteLock;
 };
 }  // namespace g4testbench
 

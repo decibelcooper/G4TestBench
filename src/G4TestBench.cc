@@ -64,14 +64,6 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-#ifdef G4MULTITHREADED
-    G4MTRunManager *runManager = new G4MTRunManager;
-    runManager->SetNumberOfThreads(nThreads);
-#else
-    G4RunManager *runManager = new G4RunManager;
-#endif
-
-    runManager->SetUserInitialization(detConst);
     G4VUserPhysicsList *physList = PhysicsList::Create(physListType);
     if (physList == NULL) {
         std::cerr << "Physics list " << physListType << " not available\n";
@@ -81,15 +73,23 @@ int main(int argc, char **argv) {
         }
         exit(EXIT_FAILURE);
     }
+
+#ifdef G4MULTITHREADED
+    G4MTRunManager *runManager = new G4MTRunManager;
+    runManager->SetNumberOfThreads(nThreads);
+#else
+    G4RunManager *runManager = new G4RunManager;
+#endif
+
+    runManager->SetUserInitialization(detConst);
     runManager->SetUserInitialization(physList);
-    runManager->SetUserInitialization(new ActionInit("asdf"));
+    runManager->SetUserInitialization(new ActionInit("asdf.proio"));
 
     runManager->Initialize();
 
-    G4UImanager *UImanager = G4UImanager::GetUIpointer();
-
     if (optind + 1 < argc) {
         G4String command = "/control/execute ";
+        G4UImanager *UImanager = G4UImanager::GetUIpointer();
         UImanager->ApplyCommand(command + argv[optind + 1]);
     } else {
         G4UIExecutive *ui = new G4UIExecutive(argc, argv);

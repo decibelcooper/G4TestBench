@@ -17,6 +17,10 @@ else()
 endif()
 include(${Geant4_USE_FILE})
 
+# Find ProIO
+find_package(proio REQUIRED)
+include_directories(${proio_INCLUDE_DIRS})
+
 # Find g4pbc
 find_package(g4pbc REQUIRED)
 include_directories(${g4pbc_INCLUDE_DIRS})
@@ -30,7 +34,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # Create targets
 add_executable(g4testbench ${sources} ${detector_sources} ${phys_list_sources})
-target_link_libraries(g4testbench ${Geant4_LIBRARIES} g4pbc::g4pbc)
+target_link_libraries(g4testbench ${Geant4_LIBRARIES} proio proio.pb g4pbc::g4pbc)
 
 # Install targets and headers
 install(TARGETS g4testbench DESTINATION bin)
