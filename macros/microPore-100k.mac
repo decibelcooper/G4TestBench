@@ -1,5 +1,5 @@
 /gun/position 0 0 -24.9977 mm
-/gun/energy 10000 keV
+/gun/energy 3000 keV
 /gun/particle gamma
 /run/setCut 10 nm
-/run/beamOn 10000
+/run/beamOn 100000
