@@ -22,7 +22,7 @@ var (
 
 func printUsage() {
 	fmt.Fprintf(os.Stderr,
-		`Usage: makeSpectrum [options] <proio-input-file> <output-pdf-file>
+		`Usage: G4TBMakeSpectrum [options] <proio-input-file> <output-pdf-file>
 
 options:
 `,
