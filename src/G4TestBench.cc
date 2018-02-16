@@ -19,12 +19,27 @@ std::map<G4String, DetFactory *> Detector::factories;
 std::map<G4String, PhysFactory *> PhysicsList::factories;
 
 void printUsage() {
-    std::cerr << "Usage: g4testbench [options] <detector type> [macro file]\n";
-    std::cerr << "options:\n";
-    std::cerr << "  -n  number of threads (default 1)\n";
-    std::cerr << "  -o  output file name (default output.proio)\n";
-    std::cerr << "  -p  physics list (default QGSP_BERT_HP)\n";
-    std::cerr << std::endl;
+    std::cout << "Usage: g4testbench [options] <detector type> [macro file]\n";
+    std::cout << "options:\n";
+    std::cout << "  -l  list all factories (e.g. physics lists and detector types)\n";
+    std::cout << "  -n  number of threads (default 1)\n";
+    std::cout << "  -o  output file name (default output.proio)\n";
+    std::cout << "  -p  physics list (default QGSP_BERT_HP)\n";
+    std::cout << std::endl;
+}
+
+void printDetectorTypes() {
+    std::cout << "Available detector types:\n";
+    for (auto type : Detector::AvailableTypes()) {
+        std::cout << "\t" << type << "\n";
+    }
+}
+
+void printPhysicsLists() {
+    std::cout << "Available physics lists:\n";
+    for (auto type : PhysicsList::AvailableTypes()) {
+        std::cout << "\t" << type << "\n";
+    }
 }
 
 int main(int argc, char **argv) {
@@ -33,8 +48,12 @@ int main(int argc, char **argv) {
     G4String outputFile = "output.proio";
     G4String physListType = "QGSP_BERT_HP";
     int opt;
-    while ((opt = getopt(argc, argv, "n:o:p:vh")) != -1) {
+    while ((opt = getopt(argc, argv, "ln:o:p:vh")) != -1) {
         switch (opt) {
+            case 'l':
+                printDetectorTypes();
+                printPhysicsLists();
+                exit(EXIT_SUCCESS);
             case 'n':
                 nThreads = atoi(optarg);
                 break;
@@ -61,21 +80,15 @@ int main(int argc, char **argv) {
 
     G4VUserDetectorConstruction *detConst = Detector::Create(detectorType);
     if (detConst == NULL) {
-        std::cerr << "Detector type " << detectorType << " not available\n";
-        std::cerr << "Available detector types:\n";
-        for (auto type : Detector::AvailableTypes()) {
-            std::cerr << "\t" << type << "\n";
-        }
+        std::cout << "Detector type " << detectorType << " not available\n";
+        printDetectorTypes();
         exit(EXIT_FAILURE);
     }
 
     G4VUserPhysicsList *physList = PhysicsList::Create(physListType);
     if (physList == NULL) {
-        std::cerr << "Physics list " << physListType << " not available\n";
-        std::cerr << "Available physics lists:\n";
-        for (auto type : PhysicsList::AvailableTypes()) {
-            std::cerr << "\t" << type << "\n";
-        }
+        std::cout << "Physics list " << physListType << " not available\n";
+        printPhysicsLists();
         exit(EXIT_FAILURE);
     }
 
