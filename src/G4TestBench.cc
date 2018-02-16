@@ -22,6 +22,7 @@ void printUsage() {
     std::cerr << "Usage: g4testbench [options] <detector type> [macro file]\n";
     std::cerr << "options:\n";
     std::cerr << "  -n  number of threads (default 1)\n";
+    std::cerr << "  -o  output file name (default output.proio)\n";
     std::cerr << "  -p  physics list (default QGSP_BERT_HP)\n";
     std::cerr << std::endl;
 }
@@ -29,12 +30,16 @@ void printUsage() {
 int main(int argc, char **argv) {
     int nThreads = 1;
     (void)nThreads;
+    G4String outputFile = "output.proio";
     G4String physListType = "QGSP_BERT_HP";
     int opt;
-    while ((opt = getopt(argc, argv, "n:p:vh")) != -1) {
+    while ((opt = getopt(argc, argv, "n:o:p:vh")) != -1) {
         switch (opt) {
             case 'n':
                 nThreads = atoi(optarg);
+                break;
+            case 'o':
+                outputFile = optarg;
                 break;
             case 'p':
                 physListType = optarg;
@@ -83,7 +88,7 @@ int main(int argc, char **argv) {
 
     runManager->SetUserInitialization(detConst);
     runManager->SetUserInitialization(physList);
-    runManager->SetUserInitialization(new ActionInit("asdf.proio"));
+    runManager->SetUserInitialization(new ActionInit(outputFile));
 
     runManager->Initialize();
 
