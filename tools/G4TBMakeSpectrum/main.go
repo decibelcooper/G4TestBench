@@ -62,6 +62,7 @@ func main() {
 
 	p := hplot.New()
 	histPlot := hplot.NewH1D(hist)
+	histPlot.Infos.Style = hplot.HInfoSummary
 	p.Add(histPlot)
 
 	if err := p.Save(4*vg.Inch, 3*vg.Inch, flag.Arg(1)); err != nil {
